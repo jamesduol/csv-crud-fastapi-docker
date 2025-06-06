@@ -4,7 +4,7 @@ import pandas as pd
 import os
 from typing import List, Optional
 
-app = FastAPI(title="CSV Management API", version="1.0.0")  # ← This must be here!
+app = FastAPI(title="CSV Management API", version="1.0.0")
 
 # CSV file path
 CSV_FILE = "data.csv"
@@ -26,7 +26,6 @@ class ItemUpdate(BaseModel):
     cognome: Optional[str] = None
     codice_fiscale: Optional[str] = None
 
-# Initialize CSV file if it doesn't exist
 def init_csv():
     if not os.path.exists(CSV_FILE):
         df = pd.DataFrame(columns=['id', 'nome', 'cognome', 'codice_fiscale'])
@@ -53,7 +52,7 @@ async def create_item(item: ItemCreate):
     """Create a new record"""
     df = read_csv()
     
-    # Check if codice_fiscale already exists
+
     if not df.empty and item.codice_fiscale in df['codice_fiscale'].values:
         raise HTTPException(status_code=400, detail="Codice fiscale already exists")
     
@@ -105,7 +104,6 @@ async def update_item(item_id: int, item_update: ItemUpdate):
     if len(item_index) == 0:
         raise HTTPException(status_code=404, detail="Item not found")
     
-    # Check if new codice_fiscale already exists (if being updated)
     if item_update.codice_fiscale:
         existing_cf = df[(df['codice_fiscale'] == item_update.codice_fiscale) & (df['id'] != item_id)]
         if not existing_cf.empty:
